@@ -1,0 +1,2054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>TerrapinEats — Healthy Campus Dining Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --brand:#E21833;
+    --brand-light:#FFECEF;
+    --brand-dark:#A41123;
+    --gold:#FFD200;
+    --gold-soft:#FFF7C7;
+    --black:#111111;
+    --bg:#F6F2EA;
+    --surface:#FFFFFF;
+    --surface2:#FAF7F0;
+    --surface3:#FFFDF8;
+    --border:#E8DFD1;
+    --t1:#16120F;
+    --t2:#6F675E;
+    --shadow:0 14px 35px rgba(17,17,17,0.10);
+    --shadow-soft:0 8px 22px rgba(17,17,17,0.07);
+    --r:18px;
+    --r-sm:12px;
+    --rb:999px;
+  }
+  html,body{
+    min-height:100%;
+    background:
+      radial-gradient(circle at top left, rgba(226,24,51,0.13), transparent 28%),
+      radial-gradient(circle at top right, rgba(255,210,0,0.18), transparent 26%),
+      linear-gradient(180deg,#FBF7EF 0%,var(--bg) 100%);
+    font-family:'DM Sans',sans-serif;color:var(--t1);
+  }
+  h1,h2,h3,.syne{font-family:'Syne',sans-serif}
+
+  #app{
+    max-width:430px;margin:0 auto;background:var(--surface);
+    min-height:100vh;position:relative;overflow:hidden;
+    box-shadow:0 0 0 1px rgba(0,0,0,0.04),0 28px 90px rgba(0,0,0,0.16);
+  }
+  #app::before{
+    content:"";position:absolute;inset:0 0 auto;height:7px;z-index:40;
+    background:linear-gradient(90deg,var(--black) 0 18%,var(--gold) 18% 34%,var(--brand) 34% 84%,#fff 84% 100%);
+    pointer-events:none;
+  }
+
+  .screen{display:none;flex-direction:column;min-height:100vh;background:linear-gradient(180deg,#fff 0%,#FFFCF7 100%)}
+  .screen.active{display:flex}
+
+  /* topbar */
+  .topbar{
+    padding:20px 20px 13px;display:flex;align-items:center;
+    justify-content:space-between;position:sticky;top:0;
+    background:rgba(255,255,255,0.94);backdrop-filter:blur(14px);z-index:10;
+    border-bottom:1px solid rgba(232,223,209,0.9);
+  }
+  .topbar h2{font-size:17px;font-weight:800;letter-spacing:-0.02em}
+  .back-btn{
+    width:38px;height:38px;border-radius:50%;background:var(--surface2);
+    border:1px solid var(--border);cursor:pointer;color:var(--black);
+    font-size:22px;padding:0;line-height:1;font-family:'DM Sans',sans-serif;
+    box-shadow:var(--shadow-soft);transition:transform .16s,background .16s;
+  }
+  .back-btn:hover{transform:translateY(-1px);background:#fff}
+  .icon-btn{
+    width:38px;height:38px;border-radius:50%;background:var(--black);color:#fff;
+    border:1px solid rgba(0,0,0,0.08);display:flex;align-items:center;
+    justify-content:center;cursor:pointer;font-size:16px;box-shadow:var(--shadow-soft);
+  }
+
+  /* home hero */
+  .home-hero{
+    background:
+      linear-gradient(135deg,rgba(0,0,0,0.18),transparent 42%),
+      radial-gradient(circle at 86% 12%,rgba(255,210,0,0.92) 0 9%,transparent 10%),
+      linear-gradient(140deg,var(--brand) 0%,#B50F22 72%,#090909 100%);
+    padding:35px 20px 24px;color:#fff;flex-shrink:0;position:relative;overflow:hidden;
+  }
+  .home-hero::after{
+    content:"TERPS";position:absolute;right:-26px;bottom:-16px;
+    font-family:'Syne',sans-serif;font-weight:800;font-size:58px;letter-spacing:-0.07em;
+    color:rgba(255,255,255,0.07);pointer-events:none;
+  }
+  .home-hero .location{
+    font-size:12px;opacity:0.92;margin-bottom:9px;display:inline-flex;align-items:center;gap:5px;
+    font-weight:700;letter-spacing:0.02em;background:rgba(0,0,0,0.18);
+    border:1px solid rgba(255,255,255,0.16);padding:6px 10px;border-radius:var(--rb);
+    position:relative;z-index:1;
+  }
+  .home-hero h1{
+    font-family:'Syne',sans-serif;font-size:31px;font-weight:800;line-height:1.08;margin-bottom:20px;
+    letter-spacing:-0.055em;position:relative;z-index:1;text-wrap:balance;
+  }
+  .home-hero h1 span{color:var(--gold);opacity:1;text-shadow:0 1px 0 rgba(0,0,0,.15)}
+  .search-bar{
+    background:rgba(255,255,255,0.16);border:1px solid rgba(255,255,255,0.36);
+    border-radius:17px;display:flex;align-items:center;gap:9px;padding:13px 15px;
+    box-shadow:0 16px 34px rgba(0,0,0,0.16);position:relative;z-index:1;
+  }
+  .search-bar:focus-within{background:rgba(255,255,255,0.22);border-color:var(--gold)}
+  .search-bar input{
+    background:none;border:none;outline:none;color:#fff;
+    font-family:'DM Sans',sans-serif;font-size:14px;flex:1;width:100%;font-weight:600;
+  }
+  .search-bar input::placeholder{color:rgba(255,255,255,0.72)}
+
+  /* chips */
+  .chips-row{
+    display:flex;gap:9px;padding:15px 20px 13px;overflow-x:auto;scrollbar-width:none;flex-shrink:0;
+    background:#fff;
+  }
+  .chips-row::-webkit-scrollbar{display:none}
+  .chip{
+    flex-shrink:0;padding:8px 14px;border-radius:var(--rb);
+    border:1px solid var(--border);font-size:13px;font-weight:800;
+    cursor:pointer;background:var(--surface);color:var(--t2);
+    transition:all 0.16s;white-space:nowrap;box-shadow:0 3px 10px rgba(0,0,0,0.035);
+  }
+  .chip.active{background:var(--black);color:#fff;border-color:var(--black);box-shadow:0 8px 18px rgba(0,0,0,0.16)}
+  .chip.active::first-letter{color:var(--gold)}
+  .chip:hover:not(.active){background:var(--gold-soft);border-color:#F2CF42;color:var(--black)}
+
+  /* section */
+  .section{padding:8px 20px 10px;flex-shrink:0;background:#fff}
+  .section-title{
+    font-family:'Syne',sans-serif;font-size:15px;font-weight:800;
+    margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;letter-spacing:-0.02em;
+  }
+  .section-title a{
+    font-family:'DM Sans',sans-serif;font-size:12px;font-weight:800;color:var(--brand);cursor:pointer;text-decoration:none;
+    background:var(--brand-light);padding:6px 10px;border-radius:var(--rb);
+  }
+
+  /* hall cards */
+  .halls-row{display:flex;gap:13px;padding:0 20px 12px;overflow-x:auto;scrollbar-width:none;flex-shrink:0;background:#fff}
+  .halls-row::-webkit-scrollbar{display:none}
+  .hall-card{
+    flex-shrink:0;width:165px;background:var(--surface);
+    border-radius:20px;overflow:hidden;border:1px solid rgba(232,223,209,0.95);
+    cursor:pointer;transition:transform 0.16s,box-shadow 0.16s,border-color .16s;
+    box-shadow:var(--shadow-soft);
+  }
+  .hall-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:rgba(226,24,51,0.25)}
+  .hall-card .thumb{
+    height:95px;display:flex;align-items:center;justify-content:center;font-size:42px;position:relative;
+    background:linear-gradient(135deg,var(--brand-light),var(--gold-soft));
+  }
+  .hall-card .thumb::after{
+    content:"";position:absolute;left:0;right:0;bottom:0;height:5px;
+    background:linear-gradient(90deg,var(--brand),var(--gold),var(--black));
+  }
+  .hall-card-body{padding:10px 11px 12px}
+  .hall-card-body h3{font-size:13px;font-weight:800;margin-bottom:3px;line-height:1.25;letter-spacing:-0.02em}
+  .hall-card-body p{font-size:11px;color:var(--t2);line-height:1.35}
+  .hall-card-body .meta{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap}
+  .badge{font-size:10px;padding:3px 8px;border-radius:var(--rb);font-weight:800;white-space:nowrap;border:1px solid transparent}
+  .badge.free{background:#EAF7E3;color:#2F6511;border-color:#D4ECC6}
+  .badge.wait{background:var(--gold-soft);color:#6E5100;border-color:#F7E38A}
+  .badge.busy{background:#FCEBEB;color:#A32D2D;border-color:#F5C7C7}
+
+  /* items grid */
+  .items-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;background:#fff}
+  .item-card{
+    background:var(--surface);border:1px solid rgba(232,223,209,0.98);
+    border-radius:20px;overflow:hidden;cursor:pointer;
+    transition:transform 0.16s,box-shadow 0.16s,border-color .16s;
+    box-shadow:var(--shadow-soft);
+  }
+  .item-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:rgba(226,24,51,0.22)}
+  .item-card .thumb{
+    height:99px;background:linear-gradient(135deg,#FFFDF8 0%,var(--surface2) 70%);
+    display:flex;align-items:center;justify-content:center;
+    font-size:44px;position:relative;
+  }
+  .item-card .thumb::before{
+    content:"";position:absolute;top:10px;left:10px;width:24px;height:5px;border-radius:10px;
+    background:linear-gradient(90deg,var(--brand),var(--gold));opacity:.9;
+  }
+  .item-card .item-body{padding:10px 11px 12px}
+  .item-card h3{font-size:13px;font-weight:800;margin-bottom:4px;line-height:1.25;letter-spacing:-0.02em}
+  .item-card .price{font-size:12px;color:var(--brand);font-weight:900;margin-top:5px;line-height:1.25}
+  .item-card .hall-label{font-size:11px;color:var(--t2);line-height:1.3}
+  .add-btn{
+    position:absolute;bottom:8px;right:8px;width:31px;height:31px;
+    border-radius:50%;background:var(--brand);color:#fff;border:2px solid #fff;
+    font-size:21px;line-height:1;display:flex;align-items:center;
+    justify-content:center;cursor:pointer;transition:transform 0.15s,background 0.15s;
+    font-family:'DM Sans',sans-serif;box-shadow:0 8px 18px rgba(226,24,51,.32);
+  }
+  .add-btn:hover{background:var(--brand-dark);transform:scale(1.05)}
+
+  /* cart bar */
+  .cart-bar{
+    position:sticky;bottom:0;padding:12px 20px 20px;
+    background:rgba(255,255,255,0.93);backdrop-filter:blur(15px);border-top:1px solid var(--border);flex-shrink:0;z-index:8;
+  }
+  .cart-btn{
+    width:100%;background:linear-gradient(135deg,var(--brand),#B80F24);color:#fff;border:none;
+    border-radius:17px;padding:15px 18px;font-family:'Syne',sans-serif;
+    font-size:15px;font-weight:800;cursor:pointer;
+    display:flex;align-items:center;justify-content:space-between;
+    transition:transform 0.15s,box-shadow 0.15s;box-shadow:0 14px 28px rgba(226,24,51,0.26);
+  }
+  .cart-btn:hover{transform:translateY(-1px);box-shadow:0 18px 34px rgba(226,24,51,0.32)}
+  .cart-btn .cart-count{
+    background:var(--gold);color:var(--black);border-radius:var(--rb);
+    padding:3px 11px;font-size:13px;font-weight:900;
+  }
+
+  /* bottom nav */
+  .bottom-nav{
+    display:flex;border-top:1px solid var(--border);
+    background:rgba(255,255,255,0.96);backdrop-filter:blur(12px);flex-shrink:0;
+  }
+  .nav-item{
+    flex:1;padding:12px 4px 14px;display:flex;flex-direction:column;
+    align-items:center;gap:4px;cursor:pointer;color:var(--t2);
+    font-size:10px;font-weight:800;transition:color 0.15s;
+  }
+  .nav-item.active{color:var(--brand)}
+  .nav-item svg{width:22px;height:22px}
+
+  /* menu screen */
+  .menu-hero{
+    height:154px;display:flex;align-items:center;justify-content:center;font-size:66px;flex-shrink:0;
+    position:relative;background:linear-gradient(135deg,var(--brand-light),var(--gold-soft));
+  }
+  .menu-hero::after{
+    content:"";position:absolute;left:20px;right:20px;bottom:0;height:6px;border-radius:10px 10px 0 0;
+    background:linear-gradient(90deg,var(--black),var(--gold),var(--brand));
+  }
+  .menu-info{padding:18px 20px 15px;border-bottom:1px solid var(--border);flex-shrink:0;background:#fff}
+  .menu-info h2{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:5px;letter-spacing:-0.04em}
+  .menu-info p{font-size:13px;color:var(--t2);line-height:1.45}
+  .menu-info .tags{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
+  .menu-scroll{flex:1;overflow-y:auto;padding:18px 20px;-webkit-overflow-scrolling:touch;background:#FFFCF7}
+  .menu-cat{margin-bottom:22px}
+  .menu-cat h3{
+    font-family:'Syne',sans-serif;font-size:12px;font-weight:800;
+    color:var(--black);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .menu-cat h3::before{content:"";width:24px;height:5px;border-radius:10px;background:var(--gold)}
+  .menu-item-row{
+    display:flex;align-items:center;gap:12px;
+    padding:13px 12px;margin-bottom:8px;border:1px solid rgba(232,223,209,0.95);
+    border-radius:17px;background:#fff;box-shadow:0 5px 16px rgba(0,0,0,.045);
+  }
+  .menu-item-row:last-child{border-bottom:1px solid rgba(232,223,209,0.95)}
+  .menu-item-row .emoji{
+    width:42px;height:42px;border-radius:14px;background:var(--surface2);
+    display:flex;align-items:center;justify-content:center;font-size:25px;flex-shrink:0;
+  }
+  .menu-item-row .info{flex:1;min-width:0}
+  .menu-item-row .info h4{font-size:14px;font-weight:800;margin-bottom:3px;letter-spacing:-0.01em}
+  .menu-item-row .info p{font-size:12px;color:var(--t2);line-height:1.38}
+  .menu-item-row .price{font-size:12px;font-weight:900;color:var(--brand);margin-right:4px;flex-shrink:0;text-align:right}
+  .qty-ctrl{display:flex;align-items:center;gap:7px;flex-shrink:0}
+  .qty-btn{
+    width:30px;height:30px;border-radius:50%;border:1px solid var(--border);
+    background:var(--surface2);font-size:18px;line-height:1;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    font-weight:800;color:var(--t1);font-family:'DM Sans',sans-serif;
+    transition:all 0.12s;
+  }
+  .qty-btn:hover{border-color:var(--brand);color:var(--brand)}
+  .qty-btn.plus{background:var(--black);color:#fff;border-color:var(--black)}
+  .qty-btn.plus:hover{background:var(--brand);border-color:var(--brand)}
+  .qty-num{font-size:14px;font-weight:900;min-width:16px;text-align:center}
+
+  /* cart screen */
+  .cart-scroll{flex:1;overflow-y:auto;padding:18px 20px;-webkit-overflow-scrolling:touch;background:#FFFCF7}
+  .cart-item-row{
+    display:flex;align-items:center;gap:12px;padding:13px 12px;margin-bottom:9px;
+    border:1px solid var(--border);border-radius:17px;background:#fff;box-shadow:var(--shadow-soft);
+  }
+  .cart-item-row .emoji{
+    width:44px;height:44px;border-radius:14px;background:var(--surface2);
+    display:flex;align-items:center;justify-content:center;font-size:27px;flex-shrink:0;
+  }
+  .cart-item-row .info{flex:1}
+  .cart-item-row .info h4{font-size:14px;font-weight:800;margin-bottom:3px}
+  .cart-item-row .info p{font-size:12px;color:var(--t2)}
+  .cart-item-row .price{font-size:14px;font-weight:900;color:var(--brand);flex-shrink:0}
+  .cart-item-row .remove{
+    background:var(--surface2);border:1px solid var(--border);border-radius:50%;color:var(--t2);cursor:pointer;
+    font-size:14px;width:28px;height:28px;padding:0;transition:all 0.12s;
+  }
+  .cart-item-row .remove:hover{color:#fff;background:var(--brand);border-color:var(--brand)}
+  .order-summary{
+    margin-top:16px;background:#fff;border-radius:20px;
+    padding:16px;border:1px solid var(--border);box-shadow:var(--shadow-soft);
+  }
+  .order-row{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;color:var(--t2)}
+  .order-row.total{
+    font-weight:900;font-size:16px;color:var(--t1);
+    border-top:1px solid var(--border);margin-top:8px;padding-top:12px;
+  }
+  .delivery-card{
+    margin-top:13px;padding:14px 16px;border:1px solid rgba(226,24,51,0.14);
+    border-radius:20px;display:flex;gap:11px;align-items:center;
+    background:linear-gradient(135deg,var(--brand-light),#fff);box-shadow:var(--shadow-soft);
+  }
+  .delivery-card .icon{font-size:23px;flex-shrink:0}
+  .delivery-card .text h4{font-size:13px;font-weight:900;margin-bottom:3px}
+  .delivery-card .text p{font-size:12px;color:var(--t2);line-height:1.35}
+  .form-field{
+    margin-top:11px;width:100%;padding:13px 14px;
+    border:1px solid var(--border);border-radius:16px;
+    font-family:'DM Sans',sans-serif;font-size:14px;color:var(--t1);
+    background:#fff;outline:none;
+    transition:border-color 0.15s,box-shadow .15s;appearance:none;-webkit-appearance:none;
+    box-shadow:0 4px 14px rgba(0,0,0,0.035);
+  }
+  .form-field:focus{border-color:var(--brand);box-shadow:0 0 0 4px var(--brand-light)}
+
+  /* confirm */
+  .confirm-body{
+    flex:1;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    padding:42px 28px;text-align:center;background:#FFFCF7;
+  }
+  .confirm-icon{font-size:82px;margin-bottom:22px;animation:popIn 0.45s cubic-bezier(0.34,1.56,0.64,1)}
+  @keyframes popIn{0%{transform:scale(0.4);opacity:0}100%{transform:scale(1);opacity:1}}
+  .confirm-body h2{font-family:'Syne',sans-serif;font-size:27px;font-weight:800;margin-bottom:8px;letter-spacing:-0.04em}
+  .confirm-body .sub{color:var(--t2);font-size:14px;line-height:1.65;margin-bottom:24px}
+  .tracker-card{
+    width:100%;background:#fff;border-radius:22px;
+    padding:18px;border:1px solid var(--border);margin-bottom:20px;box-shadow:var(--shadow-soft);
+  }
+  .tracker-meta{font-size:13px;font-weight:900;margin-bottom:3px}
+  .tracker-room{font-size:12px;color:var(--t2);margin-bottom:15px}
+  .tracker-steps{display:flex;align-items:center}
+  .t-step{display:flex;flex-direction:column;align-items:center}
+  .t-dot{
+    width:23px;height:23px;border-radius:50%;
+    border:2px solid var(--border);background:var(--surface);
+    transition:all 0.3s;
+  }
+  .t-dot.done{background:var(--brand);border-color:var(--brand)}
+  .t-dot.active{background:#fff;border-color:var(--brand);box-shadow:0 0 0 5px var(--brand-light)}
+  .t-line{flex:1;height:3px;background:var(--border);transition:background 0.3s}
+  .t-line.done{background:var(--brand)}
+  .t-label{font-size:10px;color:var(--t2);margin-top:6px;white-space:nowrap;font-weight:800}
+  .t-label.done{color:var(--brand);font-weight:900}
+  .eta-pill{
+    background:var(--black);color:var(--gold);
+    padding:14px 24px;border-radius:17px;
+    font-weight:900;font-size:15px;font-family:'Syne',sans-serif;
+    margin-bottom:20px;width:100%;text-align:center;box-shadow:var(--shadow-soft);
+  }
+  .home-again-btn{
+    width:100%;padding:14px;background:#fff;
+    border:1px solid var(--border);border-radius:17px;
+    font-family:'Syne',sans-serif;font-size:15px;font-weight:900;
+    cursor:pointer;color:var(--t1);transition:background 0.15s,transform .15s;
+    box-shadow:var(--shadow-soft);
+  }
+  .home-again-btn:hover{background:var(--gold-soft);transform:translateY(-1px)}
+
+  /* empty state */
+  .empty{text-align:center;padding:50px 20px;color:var(--t2);font-size:14px;line-height:1.55}
+  .empty a{color:var(--brand);cursor:pointer;text-decoration:none;font-weight:900;background:var(--brand-light);padding:6px 10px;border-radius:var(--rb)}
+
+  /* station modal */
+  .station-modal{
+    position:fixed;inset:0;background:rgba(0,0,0,0.52);
+    display:none;align-items:flex-end;justify-content:center;
+    z-index:99;padding:18px;
+  }
+  .station-modal.active{display:flex}
+  .station-modal-card{
+    width:100%;max-width:420px;background:var(--surface);
+    border-radius:24px 24px 18px 18px;border:1px solid rgba(255,255,255,0.5);
+    box-shadow:0 24px 70px rgba(0,0,0,0.32);overflow:hidden;
+    animation:modalUp 0.2s ease-out;
+  }
+  @keyframes modalUp{0%{transform:translateY(18px);opacity:0}100%{transform:translateY(0);opacity:1}}
+  .station-modal-head{
+    padding:17px 17px;background:linear-gradient(135deg,var(--brand),#AE1022 70%,var(--black));color:#fff;
+    display:flex;align-items:flex-start;justify-content:space-between;gap:12px;position:relative;
+  }
+  .station-modal-head::after{
+    content:"";position:absolute;left:17px;bottom:0;width:72px;height:5px;border-radius:10px 10px 0 0;background:var(--gold);
+  }
+  .station-modal-head h3{font-size:19px;font-weight:800;line-height:1.2;margin-bottom:4px;letter-spacing:-0.03em}
+  .station-modal-head p{font-size:12px;opacity:0.86;font-weight:700}
+  .station-close{
+    border:none;background:rgba(255,255,255,0.18);color:#fff;
+    width:34px;height:34px;border-radius:50%;font-size:21px;line-height:1;
+    cursor:pointer;flex-shrink:0;font-family:'DM Sans',sans-serif;transition:background .15s,transform .15s;
+  }
+  .station-close:hover{background:rgba(255,255,255,0.28);transform:scale(1.04)}
+  .station-modal-body{padding:16px 17px 18px;max-height:60vh;overflow-y:auto;background:#FFFCF7}
+  .station-note{
+    font-size:12px;color:var(--t2);line-height:1.5;background:#fff;
+    border:1px solid var(--border);border-radius:17px;padding:12px 13px;margin-bottom:13px;
+    box-shadow:var(--shadow-soft);
+  }
+  .station-modal-body h4{
+    font-family:'Syne',sans-serif;font-size:12px;text-transform:uppercase;
+    letter-spacing:0.08em;color:var(--black);margin:10px 0 7px;display:flex;align-items:center;gap:7px;
+  }
+  .station-modal-body h4::before{content:"";width:22px;height:5px;border-radius:10px;background:var(--gold)}
+  .station-menu-list{list-style:none}
+  .station-menu-list li{
+    display:flex;align-items:center;gap:11px;padding:12px 10px;margin-bottom:8px;
+    border:1px solid var(--border);border-radius:16px;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.04);
+  }
+  .station-menu-list li:last-child{border-bottom:1px solid var(--border)}
+  .station-menu-list .emoji{
+    width:40px;height:40px;border-radius:14px;background:var(--surface2);display:flex;align-items:center;justify-content:center;
+    font-size:24px;flex-shrink:0;
+  }
+  .station-menu-list .info{flex:1}
+  .station-menu-list .info strong{display:block;font-size:14px;font-weight:900;margin-bottom:3px;letter-spacing:-0.01em}
+  .station-menu-list .info span{font-size:12px;color:var(--t2);line-height:1.38}
+  .station-menu-list .tag{font-size:11px;color:var(--brand);font-weight:900;white-space:nowrap;background:var(--brand-light);padding:5px 8px;border-radius:var(--rb)}
+  .station-empty{font-size:13px;color:var(--t2);padding:18px 12px;text-align:center;display:block;background:#fff;border-radius:16px;border:1px dashed var(--border)}
+
+  /* scrollable content padding */
+  .scroll-pad{height:16px;background:#fff}
+
+  @media (max-width:360px){
+    .home-hero h1{font-size:28px}
+    .items-grid{gap:10px}
+    .hall-card{width:154px}
+    .item-card .thumb{height:92px}
+  }
+
+  /* ─────────────────────────────────────────────
+     DESKTOP-OPTIMIZED VERSION
+     Layout-only changes. JavaScript, IDs, handlers,
+     data structures, cart/search/modal logic are unchanged.
+  ───────────────────────────────────────────── */
+  @media (min-width:1024px){
+    html,body{
+      height:auto;
+      min-height:100%;
+      overflow-x:hidden;
+    }
+
+    body{
+      padding:28px;
+      background:
+        radial-gradient(circle at 8% 4%, rgba(226,24,51,0.18), transparent 28%),
+        radial-gradient(circle at 92% 8%, rgba(255,210,0,0.20), transparent 26%),
+        linear-gradient(135deg,#FFF8EC 0%,#F5EFE3 52%,#FFFFFF 100%);
+    }
+
+    #app{
+      max-width:1360px;
+      width:100%;
+      min-height:calc(100vh - 56px);
+      border-radius:30px;
+      overflow:hidden;
+      display:block;
+      background:#fff;
+      box-shadow:
+        0 0 0 1px rgba(17,17,17,0.06),
+        0 30px 100px rgba(17,17,17,0.18);
+    }
+
+    #app::before{
+      height:9px;
+      background:linear-gradient(90deg,var(--black) 0 16%,var(--gold) 16% 32%,var(--brand) 32% 86%,#fff 86% 100%);
+    }
+
+    .screen{
+      min-height:calc(100vh - 56px);
+      background:#fff;
+    }
+
+    /* Home becomes a desktop dashboard */
+    #home.screen.active{
+      display:grid;
+      grid-template-columns:320px minmax(0,1fr);
+      grid-template-rows:auto auto auto 1fr auto;
+      grid-template-areas:
+        "hero chips"
+        "hero hallsTitle"
+        "hero halls"
+        "hero items"
+        "nav nav";
+      min-height:calc(100vh - 56px);
+      background:
+        linear-gradient(90deg,#fff 0%,#fff 24%,#FFFCF7 24%,#FFFCF7 100%);
+    }
+
+    .home-hero{
+      grid-area:hero;
+      min-height:100%;
+      padding:42px 28px 28px;
+      border-right:1px solid rgba(232,223,209,0.85);
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-start;
+    }
+
+    .home-hero h1{
+      font-size:43px;
+      line-height:1.03;
+      margin:18px 0 28px;
+    }
+
+    .home-hero .location{
+      width:max-content;
+      max-width:100%;
+      font-size:13px;
+    }
+
+    .search-bar{
+      padding:15px 16px;
+      border-radius:20px;
+    }
+
+    .search-bar input{
+      font-size:15px;
+    }
+
+    .chips-row{
+      grid-area:chips;
+      padding:34px 34px 16px;
+      gap:11px;
+      background:#FFFCF7;
+      overflow:visible;
+      flex-wrap:wrap;
+    }
+
+    .chip{
+      padding:10px 16px;
+      font-size:13px;
+    }
+
+    #home > .section:nth-of-type(3){
+      grid-area:hallsTitle;
+      padding:12px 34px 10px;
+      background:#FFFCF7;
+    }
+
+    #home > .section:nth-of-type(5){
+      grid-area:items;
+      padding:14px 34px 34px;
+      background:#FFFCF7;
+      overflow:auto;
+    }
+
+    .section-title{
+      font-size:19px;
+      margin-bottom:14px;
+    }
+
+    .section-title a{
+      font-size:13px;
+      padding:8px 13px;
+    }
+
+    .halls-row{
+      grid-area:halls;
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:18px;
+      padding:0 34px 20px;
+      overflow:visible;
+      background:#FFFCF7;
+    }
+
+    .hall-card{
+      width:auto;
+      min-height:205px;
+      border-radius:24px;
+    }
+
+    .hall-card .thumb{
+      height:116px;
+      font-size:52px;
+    }
+
+    .hall-card-body{
+      padding:14px 15px 16px;
+    }
+
+    .hall-card-body h3{
+      font-size:16px;
+    }
+
+    .hall-card-body p{
+      font-size:12px;
+    }
+
+    .items-grid{
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:18px;
+      background:#FFFCF7;
+    }
+
+    .item-card{
+      border-radius:24px;
+      min-height:218px;
+    }
+
+    .item-card .thumb{
+      height:124px;
+      font-size:54px;
+    }
+
+    .item-card .item-body{
+      padding:13px 14px 15px;
+    }
+
+    .item-card h3{
+      font-size:15px;
+    }
+
+    .item-card .hall-label,
+    .item-card .price{
+      font-size:12px;
+    }
+
+    .scroll-pad{
+      display:none;
+    }
+
+    #home-cart-bar{
+      grid-area:items;
+      align-self:end;
+      justify-self:end;
+      width:290px;
+      margin:0 34px 30px 0;
+      border-radius:22px;
+      border:1px solid rgba(232,223,209,0.95);
+      box-shadow:var(--shadow);
+    }
+
+    .bottom-nav{
+      grid-area:nav;
+      border-top:1px solid var(--border);
+      justify-content:center;
+      gap:8px;
+      padding:10px 22px;
+      background:rgba(255,255,255,0.96);
+    }
+
+    .nav-item{
+      flex:0 0 132px;
+      border-radius:18px;
+      padding:12px 10px;
+      flex-direction:row;
+      justify-content:center;
+      font-size:12px;
+      gap:8px;
+    }
+
+    .nav-item.active{
+      background:var(--brand-light);
+      color:var(--brand);
+    }
+
+    /* Desktop menu screen */
+    #menu.screen.active{
+      display:grid;
+      grid-template-columns:320px minmax(0,1fr);
+      grid-template-rows:auto 1fr auto;
+      grid-template-areas:
+        "top top"
+        "info menu"
+        "bar bar";
+      background:#FFFCF7;
+    }
+
+    #menu .topbar{
+      grid-area:top;
+      padding:22px 30px 16px;
+      position:relative;
+    }
+
+    #menu .menu-hero{
+      grid-area:info;
+      height:auto;
+      min-height:100%;
+      border-right:1px solid var(--border);
+      font-size:86px;
+    }
+
+    #menu .menu-info{
+      grid-area:info;
+      align-self:end;
+      margin:0 22px 26px;
+      border-radius:24px;
+      border:1px solid var(--border);
+      box-shadow:var(--shadow-soft);
+      z-index:2;
+      background:rgba(255,255,255,0.94);
+    }
+
+    #menu .menu-info h2{
+      font-size:25px;
+    }
+
+    #menu .menu-scroll{
+      grid-area:menu;
+      padding:28px 34px 40px;
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:24px;
+      align-content:start;
+    }
+
+    #menu .menu-cat{
+      margin-bottom:0;
+    }
+
+    #menu .menu-cat:first-child{
+      grid-column:1 / -1;
+    }
+
+    #menu .menu-cat:first-child .menu-item-row{
+      display:grid;
+      grid-template-columns:48px minmax(0,1fr) 140px;
+    }
+
+    .menu-cat h3{
+      font-size:13px;
+      margin-bottom:14px;
+    }
+
+    .menu-item-row{
+      padding:15px 14px;
+      border-radius:20px;
+    }
+
+    .menu-item-row .info h4{
+      font-size:15px;
+    }
+
+    .menu-item-row .info p{
+      font-size:12.5px;
+    }
+
+    #menu-cart-bar{
+      grid-area:bar;
+      position:sticky;
+      bottom:0;
+      width:100%;
+      padding:14px 30px 20px;
+    }
+
+    #menu-cart-bar .cart-btn{
+      max-width:380px;
+      margin-left:auto;
+    }
+
+    /* Desktop cart/confirm screens */
+    #cart.screen.active,
+    #confirm.screen.active{
+      max-width:none;
+      background:#FFFCF7;
+    }
+
+    #cart .topbar,
+    #confirm .topbar{
+      padding:22px 30px 16px;
+      position:relative;
+    }
+
+    #cart .cart-scroll{
+      max-width:900px;
+      width:100%;
+      margin:0 auto;
+      padding:34px 30px 130px;
+      display:grid;
+      grid-template-columns:1.3fr .9fr;
+      gap:22px;
+      align-content:start;
+    }
+
+    #cart-items{
+      grid-column:1;
+    }
+
+    #order-summary,
+    #cart .delivery-card,
+    #cart .form-field{
+      grid-column:2;
+    }
+
+    #cart .delivery-card{
+      margin-top:0;
+    }
+
+    #cart .cart-bar{
+      padding:16px 30px 24px;
+    }
+
+    #cart .cart-btn{
+      max-width:420px;
+      margin-left:auto;
+      margin-right:auto;
+    }
+
+    .confirm-body{
+      max-width:680px;
+      margin:0 auto;
+      justify-content:center;
+    }
+
+    .confirm-body h2{
+      font-size:38px;
+    }
+
+    /* Desktop modal is centered, not bottom sheet */
+    .station-modal{
+      align-items:center;
+      padding:34px;
+    }
+
+    .station-modal-card{
+      max-width:720px;
+      border-radius:30px;
+    }
+
+    .station-modal-head{
+      padding:24px 26px;
+    }
+
+    .station-modal-head h3{
+      font-size:27px;
+    }
+
+    .station-modal-head p{
+      font-size:14px;
+    }
+
+    .station-close{
+      width:40px;
+      height:40px;
+    }
+
+    .station-modal-body{
+      padding:24px 26px 26px;
+      max-height:68vh;
+    }
+
+    .station-note{
+      font-size:13px;
+      padding:15px 16px;
+    }
+
+    .station-menu-list{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:12px;
+    }
+
+    .station-menu-list li{
+      margin-bottom:0;
+      align-items:flex-start;
+    }
+
+    .station-empty{
+      grid-column:1 / -1;
+    }
+  }
+
+  @media (min-width:1024px) and (max-width:1180px){
+    #home.screen.active{
+      grid-template-columns:290px minmax(0,1fr);
+    }
+
+    .items-grid{
+      grid-template-columns:repeat(3,minmax(0,1fr));
+    }
+
+    #menu .menu-scroll{
+      grid-template-columns:1fr;
+    }
+  }
+
+  @media (min-width:1400px){
+    .items-grid{
+      grid-template-columns:repeat(5,minmax(0,1fr));
+    }
+  }
+
+
+
+
+  /* ─────────────────────────────────────────────
+     SAFE REFINEMENT PASS
+     Visual/UX-only improvements. No IDs, handlers,
+     JavaScript functions, or data structures changed.
+  ───────────────────────────────────────────── */
+  :root{
+    --focus-ring:0 0 0 4px rgba(255,210,0,.45);
+    --card-border:rgba(232,223,209,.98);
+    --ink-soft:rgba(17,17,17,.72);
+  }
+
+  button,.chip,.hall-card,.item-card,.menu-item-row,.nav-item,.section-title a{
+    -webkit-tap-highlight-color:transparent;
+  }
+
+  button:focus-visible,
+  .chip:focus-visible,
+  .hall-card:focus-visible,
+  .item-card:focus-visible,
+  .nav-item:focus-visible,
+  .section-title a:focus-visible,
+  input:focus-visible,
+  select:focus-visible{
+    outline:none;
+    box-shadow:var(--focus-ring),var(--shadow-soft);
+  }
+
+  .section-title{
+    padding-top:2px;
+  }
+
+  .section-title::before{
+    content:"";
+    width:28px;
+    height:6px;
+    border-radius:999px;
+    background:linear-gradient(90deg,var(--brand),var(--gold));
+    margin-right:8px;
+    flex:0 0 auto;
+  }
+
+  .section-title{
+    justify-content:flex-start;
+    gap:6px;
+  }
+
+  .section-title a{
+    margin-left:auto;
+  }
+
+  .hall-card,.item-card,.menu-item-row,.cart-item-row,.order-summary,.delivery-card,.tracker-card,.station-note,.station-menu-list li{
+    will-change:transform;
+  }
+
+  .hall-card:active,.item-card:active,.menu-item-row:active,.cart-btn:active,.home-again-btn:active{
+    transform:scale(.985);
+  }
+
+  .item-card .price,
+  .hall-card-body .meta,
+  .badge{
+    letter-spacing:.01em;
+  }
+
+  .empty,
+  .station-empty{
+    background:linear-gradient(135deg,#fff,var(--surface3));
+    border:1px dashed rgba(226,24,51,.22);
+    border-radius:20px;
+    margin:10px 0;
+    box-shadow:0 8px 20px rgba(17,17,17,.045);
+  }
+
+  .cart-btn,
+  .home-again-btn,
+  .add-btn,
+  .qty-btn,
+  .station-close,
+  .back-btn,
+  .icon-btn{
+    touch-action:manipulation;
+  }
+
+  .form-field::placeholder{
+    color:#9A9288;
+  }
+
+  .menu-item-row[style*="cursor:pointer"]{
+    position:relative;
+  }
+
+  .menu-item-row[style*="cursor:pointer"]::after{
+    content:"View";
+    font-size:10px;
+    font-weight:900;
+    color:var(--brand);
+    background:var(--brand-light);
+    border:1px solid rgba(226,24,51,.12);
+    border-radius:999px;
+    padding:4px 7px;
+    margin-left:auto;
+  }
+
+  .station-modal.active .station-modal-card{
+    animation:modalUp .22s cubic-bezier(.2,.8,.2,1);
+  }
+
+  .station-menu-list .tag{
+    align-self:center;
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{
+      animation-duration:.001ms!important;
+      animation-iteration-count:1!important;
+      scroll-behavior:auto!important;
+      transition-duration:.001ms!important;
+    }
+  }
+
+  @media (min-width:1024px){
+    body{
+      padding:24px;
+    }
+
+    #app{
+      max-width:1440px;
+      min-height:calc(100vh - 48px);
+    }
+
+    /* More dashboard-like home layout with a clearer right-side action area */
+    #home.screen.active{
+      grid-template-columns:300px minmax(0,1fr) 300px;
+      grid-template-rows:auto auto minmax(0,1fr) auto;
+      grid-template-areas:
+        "hero chips chips"
+        "hero hallsTitle hallsTitle"
+        "hero halls items"
+        "nav nav nav";
+    }
+
+    .home-hero{
+      position:relative;
+      box-shadow:inset -1px 0 0 rgba(255,255,255,.12);
+    }
+
+    .home-hero::before{
+      content:"Healthy campus meals • UMD";
+      position:absolute;
+      left:28px;
+      right:28px;
+      bottom:28px;
+      color:rgba(255,255,255,.82);
+      font-size:13px;
+      font-weight:800;
+      padding:12px 14px;
+      border:1px solid rgba(255,255,255,.18);
+      border-radius:18px;
+      background:rgba(0,0,0,.18);
+      backdrop-filter:blur(10px);
+    }
+
+    .chips-row{
+      align-items:center;
+      border-bottom:1px solid rgba(232,223,209,.75);
+    }
+
+    .halls-row{
+      grid-template-columns:1fr;
+      align-content:start;
+      padding-right:18px;
+      overflow:auto;
+    }
+
+    .hall-card{
+      min-height:0;
+      display:grid;
+      grid-template-columns:92px 1fr;
+      align-items:stretch;
+    }
+
+    .hall-card .thumb{
+      height:100%;
+      min-height:118px;
+      font-size:42px;
+    }
+
+    .hall-card .thumb::after{
+      top:0;bottom:0;left:auto;width:5px;height:auto;
+      background:linear-gradient(180deg,var(--brand),var(--gold),var(--black));
+    }
+
+    #home > .section:nth-of-type(5){
+      border-left:1px solid rgba(232,223,209,.76);
+      padding-left:24px;
+    }
+
+    #home > .section:nth-of-type(5) .section-title{
+      position:sticky;
+      top:0;
+      z-index:2;
+      background:#FFFCF7;
+      padding-top:4px;
+      padding-bottom:12px;
+    }
+
+    .items-grid{
+      grid-template-columns:1fr;
+      gap:14px;
+    }
+
+    .item-card{
+      min-height:0;
+      display:grid;
+      grid-template-columns:96px 1fr;
+    }
+
+    .item-card .thumb{
+      height:100%;
+      min-height:112px;
+      font-size:44px;
+    }
+
+    .item-card .item-body{
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+    }
+
+    #home-cart-bar{
+      grid-area:items;
+      position:sticky;
+      bottom:24px;
+      align-self:end;
+      justify-self:stretch;
+      width:auto;
+      margin:0 34px 24px 24px;
+      z-index:5;
+    }
+
+    /* Menu screen polish */
+    #menu.screen.active{
+      grid-template-columns:300px minmax(0,1fr) 300px;
+      grid-template-areas:
+        "top top top"
+        "info menu menu"
+        "bar bar bar";
+    }
+
+    #menu .menu-scroll{
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:18px;
+      overflow:auto;
+    }
+
+    #menu .menu-cat:first-child{
+      grid-column:1 / -1;
+    }
+
+    #menu .menu-cat:first-child{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:24px;
+      padding:18px;
+      box-shadow:var(--shadow-soft);
+    }
+
+    #menu .menu-cat:not(:first-child){
+      background:rgba(255,255,255,.72);
+      border:1px solid rgba(232,223,209,.78);
+      border-radius:24px;
+      padding:16px;
+    }
+
+    #menu .menu-cat:first-child .menu-item-row{
+      grid-template-columns:48px minmax(0,1fr) 120px auto;
+    }
+
+    #menu-cart-bar{
+      background:rgba(255,255,255,.86);
+      backdrop-filter:blur(16px);
+      border-top:1px solid rgba(232,223,209,.88);
+    }
+
+    /* Cart page: clearer checkout panel */
+    #cart .cart-scroll{
+      max-width:1120px;
+      grid-template-columns:minmax(0,1.25fr) 360px;
+      gap:28px;
+    }
+
+    #order-summary,
+    #cart .delivery-card,
+    #cart .form-field{
+      position:relative;
+    }
+
+    #order-summary{
+      position:sticky;
+      top:30px;
+    }
+
+    #cart-items:empty::before{
+      content:"Your cart is ready when you are.";
+      display:block;
+      background:#fff;
+      border:1px dashed rgba(226,24,51,.25);
+      border-radius:22px;
+      padding:28px;
+      color:var(--t2);
+      font-weight:800;
+      text-align:center;
+    }
+
+    .station-modal-card{
+      max-width:780px;
+    }
+  }
+
+  @media (min-width:1181px) and (max-width:1320px){
+    #menu .menu-scroll{
+      grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+  }
+
+  @media (min-width:1500px){
+    #app{
+      max-width:1480px;
+    }
+  }
+
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ── HOME ── -->
+  <div id="home" class="screen active">
+    <div class="home-hero">
+      <div class="location">📍 University of Maryland, College Park</div>
+      <h1>Find healthier<br><span>UMD meals</span> fast.</h1>
+      <div class="search-bar">
+        <span style="font-size:16px;opacity:0.65">🔍</span>
+        <input type="text" placeholder="Search meals, allergens, goals…" oninput="filterItems(this.value)" id="search-input">
+      </div>
+    </div>
+
+    <div class="chips-row" id="chips-row">
+      <div class="chip active" onclick="filterCat(this,'All')">All</div>
+      <div class="chip" onclick="filterCat(this,'Vegan')">🌱 Vegan</div>
+      <div class="chip" onclick="filterCat(this,'Vegetarian')">🥗 Vegetarian</div>
+      <div class="chip" onclick="filterCat(this,'Protein')">💪 Protein</div>
+      <div class="chip" onclick="filterCat(this,'Halal')">☪️ Halal-Friendly</div>
+      <div class="chip" onclick="filterCat(this,'Allergen-Aware')">⚠️ Allergen-Aware</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">UMD Dining Halls <a onclick="showMenu(0)">See all</a></div>
+    </div>
+    <div class="halls-row" id="halls-row"></div>
+
+    <div class="section" style="margin-top:6px">
+      <div class="section-title">Healthy Picks + UMD Menu Search</div>
+      <div class="items-grid" id="items-grid"></div>
+    </div>
+
+    <div class="scroll-pad"></div>
+    <div id="home-cart-bar" class="cart-bar" style="display:none">
+      <button class="cart-btn" onclick="goCart()">
+        <span>View Cart</span>
+        <span class="cart-count" id="cart-count-home">0 items</span>
+      </button>
+    </div>
+
+    <div class="bottom-nav">
+      <div class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        Home
+      </div>
+      <div class="nav-item" onclick="goCart()">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM5.2 5H3V3H1v2h1l3.6 7.6L4.2 15c-.2.3-.2.7-.2 1 0 1.1.9 2 2 2h14v-2H6.4c-.1 0-.2-.1-.2-.2v-.1l.9-1.7H17c.8 0 1.4-.4 1.8-1l3.4-6.2c.1-.2.2-.4.2-.6 0-.6-.4-1-1-1H5.2z"/></svg>
+        Cart
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2.05V4.06c3.95.49 7 3.85 7 7.94 0 3.21-1.81 6-4.72 7.28L13 18v2.93C8.73 20.44 4 16.55 4 12c0-4.9 3.75-9 9-9.95zM13 12.5V8l-4.5 4.5 4.5 4.5v-4.5H13z"/></svg>
+        Orders
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+        Profile
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MENU ── -->
+  <div id="menu" class="screen">
+    <div class="topbar">
+      <button class="back-btn" onclick="showHome()">←</button>
+      <h2 id="menu-title">Dining Hall</h2>
+      <div class="icon-btn" onclick="goCart()">🛒</div>
+    </div>
+    <div class="menu-hero" id="menu-hero">🏛️</div>
+    <div class="menu-info">
+      <h2 id="menu-name"></h2>
+      <p id="menu-desc"></p>
+      <div class="tags">
+        <span class="badge free">✓ Health Match</span>
+        <span class="badge wait" id="menu-wait">~15 min</span>
+      </div>
+    </div>
+    <div class="menu-scroll" id="menu-scroll"></div>
+    <div id="menu-cart-bar" class="cart-bar" style="display:none">
+      <button class="cart-btn" onclick="goCart()">
+        <span>View Cart</span>
+        <span class="cart-count" id="cart-count-menu">0 items</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── CART ── -->
+  <div id="cart" class="screen">
+    <div class="topbar">
+      <button class="back-btn" onclick="showHome()">←</button>
+      <h2>Your Order</h2>
+      <div style="width:36px"></div>
+    </div>
+    <div class="cart-scroll">
+      <div id="cart-items"></div>
+      <div id="order-summary"></div>
+      <div class="delivery-card">
+        <div class="icon">🛵</div>
+        <div class="text">
+          <h4>Healthy meal pickup or delivery</h4>
+          <p>Choose where you want your meal sent</p>
+        </div>
+      </div>
+      <select id="dorm-select" class="form-field">
+        <option value="">Select your dorm / building…</option>
+        <option>Denton Hall</option>
+        <option>Ellicott Hall</option>
+        <option>Hagerstown Hall</option>
+        <option>Cambridge Hall</option>
+        <option>La Plata Hall</option>
+        <option>North Hill Apartments</option>
+        <option>South Campus Commons</option>
+        <option>Prince Frederick Hall</option>
+        <option>Stamp Student Union Area</option>
+        <option>Other (enter below)</option>
+      </select>
+      <input type="text" id="room-input" class="form-field" placeholder="Room number (e.g. 312)">
+      <div style="height:100px"></div>
+    </div>
+    <div class="cart-bar">
+      <button class="cart-btn" onclick="placeOrder()" id="checkout-btn">
+        <span>Place Order</span>
+        <span class="cart-count" id="cart-total-btn">$0.00</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── CONFIRM ── -->
+  <div id="confirm" class="screen">
+    <div class="topbar">
+      <div style="width:36px"></div>
+      <h2>Order Placed!</h2>
+      <div style="width:36px"></div>
+    </div>
+    <div class="confirm-body">
+      <div class="confirm-icon">🎉</div>
+      <h2>You're all set!</h2>
+      <p class="sub">Your healthy meal is being prepared so you can stay focused. Track it live below.</p>
+      <div class="tracker-card">
+        <div class="tracker-meta">Order #TD-<span id="order-num"></span></div>
+        <div class="tracker-room" id="order-room-display"></div>
+        <div class="tracker-steps">
+          <div class="t-step">
+            <div class="t-dot done" id="dot1"></div>
+            <div class="t-label done">Received</div>
+          </div>
+          <div class="t-line done" id="line1"></div>
+          <div class="t-step">
+            <div class="t-dot active" id="dot2"></div>
+            <div class="t-label" id="lbl2">Preparing</div>
+          </div>
+          <div class="t-line" id="line2"></div>
+          <div class="t-step">
+            <div class="t-dot" id="dot3"></div>
+            <div class="t-label" id="lbl3">On the way</div>
+          </div>
+          <div class="t-line" id="line3"></div>
+          <div class="t-step">
+            <div class="t-dot" id="dot4"></div>
+            <div class="t-label" id="lbl4">Delivered</div>
+          </div>
+        </div>
+      </div>
+      <div class="eta-pill" id="eta-badge">🕐 Ready in 10–20 min</div>
+      <button class="home-again-btn" onclick="resetApp()">Back to Home</button>
+    </div>
+  </div>
+
+
+  <!-- ── STATION MODAL ── -->
+  <div id="station-modal" class="station-modal" onclick="if(event.target === this) closeStation()">
+    <div class="station-modal-card">
+      <div class="station-modal-head">
+        <div>
+          <h3 id="station-modal-title">Station</h3>
+          <p id="station-modal-hall">Dining Hall</p>
+        </div>
+        <button class="station-close" onclick="closeStation()" aria-label="Close station menu">×</button>
+      </div>
+      <div class="station-modal-body">
+        <div class="station-note" id="station-modal-note"></div>
+        <h4>Menu</h4>
+        <ul class="station-menu-list" id="station-modal-menu"></ul>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const verifiedDiningData = [
+  {
+    name: 'Yahentamitsi Dining Hall',
+    location_area: 'Heritage Community (North Campus)',
+    permanent_stations: [
+      'Woks (Stir-fry)',
+      'Maryland Bakery',
+      'Sprouts (Plant-Based)',
+      "Chef's Corner (International/Action Station)",
+      "Joe's Grill (Burgers & Sandwiches)",
+      'Terp Comfort (Traditional Entrees)',
+      'Al Forno Pastas',
+      'Mezza (Pizza & Mediterranean)',
+      'Good Food Gluten Free',
+      'Salad Bar'
+    ],
+    has_mongolian_grill: true,
+    notes: "Confirmed: The Mongolian Grill is located at the 'Woks' station. The Maryland Bakery is a dedicated permanent station at this location."
+  },
+  {
+    name: 'South Campus Dining Hall',
+    location_area: 'South Hill Community',
+    permanent_stations: [
+      'Seasons 12 (Mongolian Grill)',
+      'Veggie Bowls',
+      'The Grill',
+      'Pizza & Pasta',
+      'Salad Bar',
+      'Deli',
+      'The Bakery'
+    ],
+    has_mongolian_grill: true,
+    notes: "Home to the original 'Seasons 12' Mongolian Grill concept."
+  },
+  {
+    name: '251 North',
+    location_area: 'Denton Community (North Campus)',
+    permanent_stations: [
+      'Purple Zone (Certified Allergen-Free)',
+      'The Grill',
+      'Harvest (Salad Bar)',
+      'Main Plate (Entrees)',
+      'Ciao (Pizza/Pasta)'
+    ],
+    has_mongolian_grill: false,
+    notes: "Features the 'Purple Zone' which is certified Free From™ the nine common food allergens."
+  }
+];
+
+const diningByName = Object.fromEntries(verifiedDiningData.map(h => [h.name, h]));
+
+const halls = [
+  {
+    id: 0,
+    emoji: '🏛️',
+    name: 'South Campus Dining Hall',
+    location_area: diningByName['South Campus Dining Hall'].location_area,
+    permanent_stations: diningByName['South Campus Dining Hall'].permanent_stations,
+    has_mongolian_grill: diningByName['South Campus Dining Hall'].has_mongolian_grill,
+    notes: diningByName['South Campus Dining Hall'].notes,
+    desc: diningByName['South Campus Dining Hall'].location_area + ' · Seasons 12 Mongolian Grill',
+    wait: 'Live menu',
+    bg: '#FFF0EB'
+  },
+  {
+    id: 1,
+    emoji: '🌿',
+    name: 'Yahentamitsi Dining Hall',
+    location_area: diningByName['Yahentamitsi Dining Hall'].location_area,
+    permanent_stations: diningByName['Yahentamitsi Dining Hall'].permanent_stations,
+    has_mongolian_grill: diningByName['Yahentamitsi Dining Hall'].has_mongolian_grill,
+    notes: diningByName['Yahentamitsi Dining Hall'].notes,
+    desc: diningByName['Yahentamitsi Dining Hall'].location_area + ' · Woks, Bakery, Sprouts, and global stations',
+    wait: 'Live menu',
+    bg: '#EAF3DE'
+  },
+  {
+    id: 2,
+    emoji: '🍽️',
+    name: '251 North',
+    location_area: diningByName['251 North'].location_area,
+    permanent_stations: diningByName['251 North'].permanent_stations,
+    has_mongolian_grill: diningByName['251 North'].has_mongolian_grill,
+    notes: diningByName['251 North'].notes,
+    desc: diningByName['251 North'].location_area + ' · Purple Zone allergen-free station',
+    wait: 'Live menu',
+    bg: '#E6F1FB'
+  },
+];
+
+function stationEmoji(name) {
+  const n = name.toLowerCase();
+  if (n.includes('wok') || n.includes('mongolian')) return '🍜';
+  if (n.includes('bakery')) return '🥐';
+  if (n.includes('sprouts') || n.includes('plant') || n.includes('veggie')) return '🌱';
+  if (n.includes('chef')) return '👨‍🍳';
+  if (n.includes('grill') || n.includes('burger') || n.includes('sandwich')) return '🍔';
+  if (n.includes('comfort') || n.includes('plate') || n.includes('entree')) return '🍽️';
+  if (n.includes('pasta') || n.includes('ciao')) return '🍝';
+  if (n.includes('pizza') || n.includes('mezza')) return '🍕';
+  if (n.includes('gluten') || n.includes('allergen') || n.includes('purple')) return '🛡️';
+  if (n.includes('salad') || n.includes('harvest')) return '🥗';
+  if (n.includes('deli')) return '🥪';
+  return '🍴';
+}
+
+function stationTags(name, hall) {
+  const n = name.toLowerCase();
+  const tags = [];
+  if (n.includes('sprouts') || n.includes('plant') || n.includes('veggie') || n.includes('salad') || n.includes('harvest')) tags.push('Vegan', 'Vegetarian');
+  if (n.includes('grill') || n.includes('wok') || n.includes('mongolian') || n.includes('beans') || n.includes('protein')) tags.push('Protein');
+  if (n.includes('gluten') || n.includes('allergen') || n.includes('purple')) tags.push('Allergen-Aware');
+  if (n.includes('mezza') || n.includes('wok')) tags.push('Halal');
+  if (tags.length === 0) tags.push('Vegetarian');
+  return [...new Set(tags)];
+}
+
+const stationData = halls.flatMap(hall => hall.permanent_stations.map(stationName => ({
+  hallId: hall.id,
+  emoji: stationEmoji(stationName),
+  name: stationName,
+  desc: `${stationName} at ${hall.name} · ${hall.location_area}. ${hall.notes}`,
+  tags: stationTags(stationName, hall),
+  notes: hall.notes,
+  location_area: hall.location_area,
+  has_mongolian_grill: hall.has_mongolian_grill
+})));
+
+const menuData = [
+  // South Campus Dining Hall
+  {hallId:0, station:'Breakfast Fuel', cat:'Breakfast Fuel', emoji:'🥣', name:'Oatmeal', desc:'Vegan + vegetarian breakfast base; good for steady energy', price:0, tag:'Vegan', time:['breakfast']},
+  {hallId:0, station:'Breakfast Fuel', cat:'Breakfast Fuel', emoji:'🍓', name:'Fresh Strawberry', desc:'Vegan fruit option for a lighter meal add-on', price:0, tag:'Vegan', time:['breakfast','lunch']},
+  {hallId:0, station:'Breakfast Fuel', cat:'Breakfast Fuel', emoji:'🍉', name:'Watermelon', desc:'Vegan fruit option; refreshing and simple', price:0, tag:'Vegan', time:['breakfast','lunch','dinner']},
+  {hallId:0, station:'Breakfast Fuel', cat:'Protein + Focus', emoji:'🥚', name:'Hard Boiled Egg', desc:'Vegetarian protein option; contains egg', price:0, tag:'Protein', time:['breakfast','lunch']},
+  {hallId:0, station:'Breakfast Fuel', cat:'Protein + Focus', emoji:'🍳', name:'Scrambled Egg Whites', desc:'Lean vegetarian protein; contains egg', price:0, tag:'Protein', time:['breakfast']},
+  {hallId:0, station:'Vegetable Sides', cat:'Vegetable Sides', emoji:'🥦', name:'Fresh Steamed Broccoli', desc:'Vegan + vegetarian vegetable side', price:0, tag:'Vegan', time:['lunch','dinner']},
+  {hallId:0, station:'Vegetable Sides', cat:'Vegetable Sides', emoji:'🥕', name:'Fresh Roasted Carrots', desc:'Vegan + vegetarian side for a balanced plate', price:0, tag:'Vegan', time:['lunch','dinner']},
+  {hallId:0, station:'Vegetable Sides', cat:'Vegetable Sides', emoji:'🍠', name:'Roasted Sweet Potatoes with Peppers', desc:'Vegan + vegetarian carb and veggie option', price:0, tag:'Vegan', time:['lunch','dinner']},
+
+  {hallId:0, station:'Seasons 12 (Mongolian Grill)', cat:'Seasons 12 (Mongolian Grill)', emoji:'🍗', name:'Asian Chicken Mongolian Grill', desc:'125 cal, 26.3g protein, 1.4g fat, 74mg sodium per 4 oz serving', price:0, tag:'Protein', time:['lunch','dinner']},
+  {hallId:0, station:'Seasons 12 (Mongolian Grill)', cat:'Seasons 12 (Mongolian Grill)', emoji:'🥩', name:'Asian Beef Mongolian Grill', desc:'High-protein beef bowl option from Seasons 12', price:0, tag:'Protein', time:['lunch','dinner']},
+  {hallId:0, station:'Seasons 12 (Mongolian Grill)', cat:'Seasons 12 (Mongolian Grill)', emoji:'🍤', name:'Asian Shrimp Mongolian Grill', desc:'Lean seafood protein; contains shellfish', price:0, tag:'Protein', time:['lunch','dinner']},
+  {hallId:0, station:'Seasons 12 (Mongolian Grill)', cat:'Seasons 12 (Mongolian Grill)', emoji:'🍜', name:'Pad Thai Noodle Mongolian Grill', desc:'Noodle base for a build-your-own Mongolian Grill bowl', price:0, tag:'Allergen-Aware', time:['lunch','dinner']},
+  {hallId:0, station:'Seasons 12 (Mongolian Grill)', cat:'Seasons 12 (Mongolian Grill)', emoji:'🥦', name:'Broccoli', desc:'Vegan + vegetarian Seasons 12 vegetable option', price:0, tag:'Vegan', time:['lunch','dinner']},
+  {hallId:0, station:'Seasons 12 (Mongolian Grill)', cat:'Seasons 12 (Mongolian Grill)', emoji:'🌱', name:'Bean Sprouts', desc:'Vegan + vegetarian Seasons 12 topping', price:0, tag:'Vegan', time:['lunch','dinner']},
+  {hallId:0, station:'Seasons 12 (Mongolian Grill)', cat:'Seasons 12 (Mongolian Grill)', emoji:'🍚', name:'Brown Rice', desc:'Vegan + vegetarian grain base for a balanced bowl', price:0, tag:'Vegan', time:['lunch','dinner']},
+  {hallId:0, station:'Seasons 12 (Mongolian Grill)', cat:'Seasons 12 (Mongolian Grill)', emoji:'🫛', name:'Edamame', desc:'Vegan + vegetarian plant protein; contains soy', price:0, tag:'Protein', time:['lunch','dinner']},
+
+  {hallId:0, station:'Veggie Bowls', cat:'Veggie Bowls', emoji:'🥗', name:'Roasted Vegetable Grain Bowl', desc:'Vegetarian bowl with grains and roasted vegetables', price:0, tag:'Vegetarian', time:['lunch','dinner']},
+  {hallId:0, station:'Veggie Bowls', cat:'Veggie Bowls', emoji:'🫘', name:'Black Bean Veggie Bowl', desc:'Plant-protein bowl with beans, rice, and vegetables', price:0, tag:'Protein', time:['lunch','dinner']},
+  {hallId:0, station:'The Grill', cat:'The Grill', emoji:'🍔', name:'Turkey Burger', desc:'Lean grill option with protein', price:0, tag:'Protein', time:['lunch','dinner']},
+  {hallId:0, station:'The Grill', cat:'The Grill', emoji:'🍗', name:'Grilled Chicken Sandwich', desc:'High-protein sandwich from The Grill', price:0, tag:'Protein', time:['lunch','dinner']},
+  {hallId:0, station:'Pizza & Pasta', cat:'Pizza & Pasta', emoji:'🍕', name:'Cheese Pizza Slice', desc:'Vegetarian pizza option', price:0, tag:'Vegetarian', time:['lunch','dinner']},
+  {hallId:0, station:'Pizza & Pasta', cat:'Pizza & Pasta', emoji:'🍝', name:'Marinara Pasta', desc:'Pasta with tomato sauce; vegetarian-friendly', price:0, tag:'Vegetarian', time:['lunch','dinner']},
+  {hallId:0, station:'Salad Bar', cat:'Salad Bar', emoji:'🥬', name:'Mixed Greens Salad', desc:'Vegan salad base with fresh vegetables', price:0, tag:'Vegan', time:['lunch','dinner']},
+  {hallId:0, station:'Salad Bar', cat:'Salad Bar', emoji:'🥒', name:'Cucumber Tomato Salad', desc:'Fresh vegetable salad topping', price:0, tag:'Vegan', time:['lunch','dinner']},
+  {hallId:0, station:'Deli', cat:'Deli', emoji:'🥪', name:'Turkey Deli Sandwich', desc:'Deli sandwich with lean protein', price:0, tag:'Protein', time:['lunch','dinner']},
+  {hallId:0, station:'Deli', cat:'Deli', emoji:'🥬', name:'Veggie Wrap', desc:'Vegetarian wrap with fresh vegetables', price:0, tag:'Vegetarian', time:['lunch','dinner']},
+  {hallId:0, station:'The Bakery', cat:'The Bakery', emoji:'🥯', name:'Bagel', desc:'Breakfast bakery option', price:0, tag:'Vegetarian', time:['breakfast']},
+  {hallId:0, station:'The Bakery', cat:'The Bakery', emoji:'🫐', name:'Blueberry Muffin', desc:'Bakery breakfast item', price:0, tag:'Vegetarian', time:['breakfast']},
+  {hallId:0, station:'The Bakery', cat:'The Bakery', emoji:'🍪', name:'Oatmeal Cookie', desc:'Bakery dessert option', price:0, tag:'Vegetarian', time:['lunch','dinner']},
+
+  // Yahentamitsi Dining Hall
+  {hallId:1, station:'Woks (Stir-fry)', cat:'Woks (Stir-fry)', emoji:'🥢', name:'Woks Vegetable Stir-Fry', desc:'Yahentamitsi Woks station option with vegetables and rice', price:0, tag:'Vegan', time:['lunch','dinner']},
+  {hallId:1, station:'Woks (Stir-fry)', cat:'Woks (Stir-fry)', emoji:'🫛', name:'Woks Edamame Bowl', desc:'Plant-protein bowl; contains soy', price:0, tag:'Protein', time:['lunch','dinner']},
+  {hallId:1, station:'Woks (Stir-fry)', cat:'Woks (Stir-fry)', emoji:'🍚', name:'Woks Brown Rice Bowl', desc:'Vegan grain base for a balanced meal', price:0, tag:'Vegan', time:['lunch','dinner']},
+  {hallId:1, station:'Woks (Stir-fry)', cat:'Woks (Stir-fry)', emoji:'🍜', name:'Stir-Fry Noodle Bowl', desc:'Woks noodle bowl with vegetables', price:0, tag:'Vegetarian', time:['lunch','dinner']},
+
+  {hallId:1, station:'Maryland Bakery', cat:'Maryland Bakery', emoji:'🥯', name:'Plain Bagel', desc:'Bakery breakfast option', price:0, tag:'Vegetarian', time:['breakfast']},
+  {hallId:1, station:'Maryland Bakery', cat:'Maryland Bakery', emoji:'🫐', name:'Blueberry Muffin', desc:'Bakery muffin option', price:0, tag:'Vegetarian', time:['breakfast']},
+  {hallId:1, station:'Maryland Bakery', cat:'Maryland Bakery', emoji:'🥐', name:'Croissant', desc:'Bakery pastry option', price:0, tag:'Vegetarian', time:['breakfast']},
+  {hallId:1, station:'Maryland Bakery', cat:'Maryland Bakery', emoji:'🍪', name:'Chocolate Chip Cookie', desc:'Bakery dessert item', price:0, tag:'Vegetarian', time:['lunch','dinner']},
+
+  {hallId:1, station:'Sprouts (Plant-Based)', cat:'Sprouts (Plant-Based)', emoji:'🍔', name:'Black Bean Chipotle Burger', desc:'Vegan + vegetarian; contains gluten and soy', price:0, tag:'Vegan', time:['lunch','dinner']},
+  {hallId:1, station:'Sprouts (Plant-Based)', cat:'Sprouts (Plant-Based)', emoji:'🍲', name:'Butternut Squash Green Pepper Lentils', desc:'Vegan + vegetarian fiber-rich meal component', price:0, tag:'Vegan', time:['lunch','dinner']},
+  {hallId:1, station:'Sprouts (Plant-Based)', cat:'Sprouts (Plant-Based)', emoji:'🍚', name:'Brown Rice', desc:'Vegan + vegetarian grain base', price:0, tag:'Vegan', time:['lunch','dinner']},
+  {hallId:1, station:'Sprouts (Plant-Based)', cat:'Sprouts (Plant-Based)', emoji:'🥬', name:'Chopped Kale', desc:'Vegan + vegetarian greens for salads and bowls', price:0, tag:'Vegan', time:['lunch','dinner']},
+  {hallId:1, station:"Chef's Corner (International/Action Station)", cat:"Chef's Corner (International/Action Station)", emoji:'🥘', name:'International Chicken Bowl', desc:'Rotating action-station bowl with lean protein', price:0, tag:'Protein', time:['lunch','dinner']},
+  {hallId:1, station:"Chef's Corner (International/Action Station)", cat:"Chef's Corner (International/Action Station)", emoji:'🍛', name:'Vegetable Curry Bowl', desc:'International vegetarian bowl with rice', price:0, tag:'Vegetarian', time:['lunch','dinner']},
+  {hallId:1, station:"Joe's Grill (Burgers & Sandwiches)", cat:"Joe's Grill (Burgers & Sandwiches)", emoji:'🍔', name:'Grilled Chicken Sandwich', desc:'High-protein sandwich from Joe’s Grill', price:0, tag:'Protein', time:['lunch','dinner']},
+  {hallId:1, station:"Joe's Grill (Burgers & Sandwiches)", cat:"Joe's Grill (Burgers & Sandwiches)", emoji:'🥪', name:'Veggie Burger', desc:'Vegetarian grill option', price:0, tag:'Vegetarian', time:['lunch','dinner']},
+  {hallId:1, station:'Terp Comfort (Traditional Entrees)', cat:'Terp Comfort (Traditional Entrees)', emoji:'🍗', name:'Grilled Southwestern Chipotle Pesto Chicken Thigh', desc:'Halal-friendly protein option from UMD menu labels', price:0, tag:'Halal', time:['lunch','dinner']},
+  {hallId:1, station:'Terp Comfort (Traditional Entrees)', cat:'Terp Comfort (Traditional Entrees)', emoji:'🥘', name:'Avocado Chipotle Ranch Chicken', desc:'Halal-friendly; contains dairy, egg, and soy', price:0, tag:'Halal', time:['lunch','dinner']},
+  {hallId:1, station:'Al Forno Pastas', cat:'Al Forno Pastas', emoji:'🌾', name:'Red Lentil Penne Pasta', desc:'Vegan + vegetarian pasta option', price:0, tag:'Allergen-Aware', time:['lunch','dinner']},
+  {hallId:1, station:'Al Forno Pastas', cat:'Al Forno Pastas', emoji:'🍝', name:'Pasta Marinara', desc:'Vegetarian pasta with tomato sauce', price:0, tag:'Vegetarian', time:['lunch','dinner']},
+  {hallId:1, station:'Mezza (Pizza & Mediterranean)', cat:'Mezza (Pizza & Mediterranean)', emoji:'🍕', name:'Cheese Pizza', desc:'Vegetarian pizza option', price:0, tag:'Vegetarian', time:['lunch','dinner']},
+  {hallId:1, station:'Mezza (Pizza & Mediterranean)', cat:'Mezza (Pizza & Mediterranean)', emoji:'🥙', name:'Hummus Pita Plate', desc:'Mediterranean vegetarian plate', price:0, tag:'Vegetarian', time:['lunch','dinner']},
+  {hallId:1, station:'Good Food Gluten Free', cat:'Good Food Gluten Free', emoji:'🍄', name:'Vegan Mushroom Parmesan Risotto', desc:'Vegan + vegetarian; contains soy', price:0, tag:'Allergen-Aware', time:['lunch','dinner']},
+  {hallId:1, station:'Good Food Gluten Free', cat:'Good Food Gluten Free', emoji:'🛡️', name:'Gluten-Free Chicken Plate', desc:'Allergen-aware protein plate', price:0, tag:'Allergen-Aware', time:['lunch','dinner']},
+  {hallId:1, station:'Salad Bar', cat:'Salad Bar', emoji:'🥗', name:'Garden Salad', desc:'Vegan salad with mixed greens and vegetables', price:0, tag:'Vegan', time:['lunch','dinner']},
+  {hallId:1, station:'Salad Bar', cat:'Salad Bar', emoji:'🫘', name:'Bean and Greens Salad', desc:'Plant-protein salad option', price:0, tag:'Protein', time:['lunch','dinner']},
+
+  // 251 North
+  {hallId:2, station:'Purple Zone (Certified Allergen-Free)', cat:'Purple Zone (Certified Allergen-Free)', emoji:'🛡️', name:'Allergen-Free Chicken Rice Bowl', desc:'Simple allergen-aware bowl from the Purple Zone', price:0, tag:'Allergen-Aware', time:['lunch','dinner']},
+  {hallId:2, station:'Purple Zone (Certified Allergen-Free)', cat:'Purple Zone (Certified Allergen-Free)', emoji:'🥔', name:'Roasted Potato Plate', desc:'Certified allergen-aware side plate', price:0, tag:'Allergen-Aware', time:['breakfast','lunch','dinner']},
+  {hallId:2, station:'Purple Zone (Certified Allergen-Free)', cat:'Purple Zone (Certified Allergen-Free)', emoji:'🥗', name:'Allergen-Free Greens Bowl', desc:'Purple Zone greens and vegetable bowl', price:0, tag:'Allergen-Aware', time:['lunch','dinner']},
+  {hallId:2, station:'The Grill', cat:'The Grill', emoji:'🍔', name:'Beef Burger', desc:'Classic grill burger', price:0, tag:'Protein', time:['lunch','dinner']},
+  {hallId:2, station:'The Grill', cat:'The Grill', emoji:'🍗', name:'Grilled Chicken Plate', desc:'High-protein grill plate', price:0, tag:'Protein', time:['lunch','dinner']},
+  {hallId:2, station:'Harvest (Salad Bar)', cat:'Harvest (Salad Bar)', emoji:'🥗', name:'Mixed Greens', desc:'Vegan + vegetarian salad base', price:0, tag:'Vegetarian', time:['lunch','dinner']},
+  {hallId:2, station:'Harvest (Salad Bar)', cat:'Harvest (Salad Bar)', emoji:'🫘', name:'Black Beans', desc:'Vegan + vegetarian plant protein', price:0, tag:'Protein', time:['lunch','dinner']},
+  {hallId:2, station:'Harvest (Salad Bar)', cat:'Harvest (Salad Bar)', emoji:'🧆', name:'Garbanzo Beans', desc:'Vegan + vegetarian plant protein', price:0, tag:'Protein', time:['lunch','dinner']},
+  {hallId:2, station:'Harvest (Salad Bar)', cat:'Harvest (Salad Bar)', emoji:'🫛', name:'Edamame', desc:'Vegan + vegetarian protein; contains soy', price:0, tag:'Protein', time:['lunch','dinner']},
+  {hallId:2, station:'Harvest (Salad Bar)', cat:'Harvest (Salad Bar)', emoji:'🥒', name:'Cucumber', desc:'Vegan + vegetarian fresh topping', price:0, tag:'Vegan', time:['lunch','dinner']},
+  {hallId:2, station:'Harvest (Salad Bar)', cat:'Harvest (Salad Bar)', emoji:'🌽', name:'Roasted Corn, Black Beans and Tomatoes', desc:'Vegan + vegetarian bowl topping', price:0, tag:'Vegan', time:['lunch','dinner']},
+  {hallId:2, station:'Main Plate (Entrees)', cat:'Main Plate (Entrees)', emoji:'🍽️', name:'Herb Roasted Chicken', desc:'Main entree protein plate', price:0, tag:'Protein', time:['lunch','dinner']},
+  {hallId:2, station:'Main Plate (Entrees)', cat:'Main Plate (Entrees)', emoji:'🥦', name:'Vegetable Entree Plate', desc:'Vegetarian entree plate with vegetables and grains', price:0, tag:'Vegetarian', time:['lunch','dinner']},
+  {hallId:2, station:'Ciao (Pizza/Pasta)', cat:'Ciao (Pizza/Pasta)', emoji:'🍕', name:'Cheese Pizza', desc:'Vegetarian pizza option', price:0, tag:'Vegetarian', time:['lunch','dinner']},
+  {hallId:2, station:'Ciao (Pizza/Pasta)', cat:'Ciao (Pizza/Pasta)', emoji:'🍝', name:'Penne Marinara', desc:'Vegetarian pasta with marinara sauce', price:0, tag:'Vegetarian', time:['lunch','dinner']},
+  {hallId:2, station:'Dressings + Add-ons', cat:'Harvest (Salad Bar)', emoji:'🥄', name:'Raspberry Vinaigrette Lite', desc:'Vegan + vegetarian lighter dressing option', price:0, tag:'Allergen-Aware', time:['lunch','dinner']},
+  {hallId:2, station:'Dressings + Add-ons', cat:'Harvest (Salad Bar)', emoji:'🥑', name:'Guacamole', desc:'Vegan + vegetarian add-on with healthy fats', price:0, tag:'Vegan', time:['lunch','dinner']},
+];
+
+let cart = [];
+let currentHallId = null;
+let activeTag = 'All';
+
+function getCurrentMealPeriod() {
+  const now = new Date();
+  const minutes = now.getHours() * 60 + now.getMinutes();
+  if (minutes >= 7 * 60 && minutes < 10 * 60 + 30) return 'breakfast';
+  if (minutes >= 10 * 60 + 30 && minutes < 16 * 60) return 'lunch';
+  if (minutes >= 16 * 60 && minutes < 21 * 60) return 'dinner';
+  return 'closed';
+}
+function mealLabel(period = getCurrentMealPeriod()) {
+  if (period === 'breakfast') return 'Breakfast';
+  if (period === 'lunch') return 'Lunch';
+  if (period === 'dinner') return 'Dinner';
+  return 'Closed';
+}
+function itemAvailableNow(item) {
+  const period = getCurrentMealPeriod();
+  return period !== 'closed' && Array.isArray(item.time) && item.time.includes(period);
+}
+function itemHasAnyTime(item) {
+  return Array.isArray(item.time) && item.time.length > 0;
+}
+
+function norm(s) { return String(s || '').toLowerCase(); }
+function itemMatchesQuery(item, q) {
+  const hall = halls[item.hallId];
+  const station = stationData.find(s => s.hallId === item.hallId && s.name === item.station);
+  const searchableText = [
+    item.name,
+    item.desc,
+    item.cat,
+    item.station,
+    item.tag,
+    hall.name,
+    hall.desc,
+    hall.location_area,
+    hall.notes,
+    ...(hall.permanent_stations || []),
+    station ? station.desc : '',
+    station ? station.notes : '',
+    station ? station.tags.join(' ') : ''
+  ].join(' ');
+  return norm(searchableText).includes(q);
+}
+function stationMatchesQuery(station, q) {
+  const hall = halls[station.hallId];
+  const searchableText = [
+    station.name,
+    station.desc,
+    station.notes,
+    station.location_area,
+    station.tags.join(' '),
+    hall.name,
+    hall.desc,
+    hall.location_area,
+    hall.notes,
+    ...(hall.permanent_stations || [])
+  ].join(' ');
+  return norm(searchableText).includes(q);
+}
+
+// ── Navigation ──
+function showHome() {
+  switchScreen('home');
+}
+function showMenu(hallId) {
+  currentHallId = hallId;
+  const h = halls[hallId];
+  document.getElementById('menu-title').textContent = h.name;
+  document.getElementById('menu-name').textContent = h.name;
+  document.getElementById('menu-desc').textContent = h.desc + ' · Open 7am – 9pm';
+  document.getElementById('menu-wait').textContent = h.wait;
+  const hero = document.getElementById('menu-hero');
+  hero.textContent = h.emoji;
+  hero.style.background = h.bg;
+  renderMenuItems(hallId);
+  switchScreen('menu');
+  updateCartBars();
+}
+function goCart() {
+  renderCart();
+  switchScreen('cart');
+}
+function switchScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ── Render halls ──
+function renderHalls() {
+  document.getElementById('halls-row').innerHTML = halls.map(h => `
+    <div class="hall-card" onclick="showMenu(${h.id})">
+      <div class="thumb" style="background:${h.bg}">${h.emoji}</div>
+      <div class="hall-card-body">
+        <h3>${h.name}</h3>
+        <p>${h.desc}</p>
+        <div class="meta">
+          <span class="badge free">Meal Plan</span>
+          <span class="badge wait">${h.wait}</span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ── Filter chips ──
+function filterCat(el, tag) {
+  activeTag = tag;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('search-input').value = '';
+  renderFeaturedItems();
+}
+
+// ── Featured items ──
+function renderFeaturedItems(query = '') {
+  const grid = document.getElementById('items-grid');
+  const q = norm(query.trim());
+  let foodItems = menuData.slice();
+  let stations = stationData.slice();
+
+  if (activeTag !== 'All') {
+    foodItems = foodItems.filter(i => i.tag === activeTag);
+    stations = stations.filter(s => s.tags.includes(activeTag));
+  }
+
+  if (q) {
+    foodItems = foodItems.filter(i => itemMatchesQuery(i, q));
+    stations = stations.filter(s => stationMatchesQuery(s, q));
+  }
+
+  const stationCards = stations.map(station => ({type:'station', ...station}));
+  const foodCards = foodItems.map(item => ({type:'food', ...item}));
+  const results = q ? [...stationCards, ...foodCards] : foodCards;
+
+  if (results.length === 0) {
+    grid.innerHTML = '<p style="grid-column:span 2;color:var(--t2);font-size:13px;text-align:center;padding:24px 0">No matching food found — try chicken, vegan, protein, rice, salad, woks, or mongolian grill</p>';
+    return;
+  }
+
+  grid.innerHTML = results.slice(0, 10).map(item => {
+    if (item.type === 'station') {
+      return `<div class="item-card" onclick="openStation('${esc(item.name)}','${esc(halls[item.hallId].name)}')">
+        <div class="thumb">${item.emoji}</div>
+        <div class="item-body">
+          <h3>${item.name}</h3>
+          <div class="hall-label">Station · ${halls[item.hallId].name}</div>
+          <div class="price">${item.tags.slice(0,2).join(' • ')}</div>
+        </div>
+      </div>`;
+    }
+    return `<div class="item-card" onclick="showMenu(${item.hallId})">
+      <div class="thumb">${item.emoji}
+        <button class="add-btn" onclick="event.stopPropagation();addItem(${item.hallId},'${esc(item.name)}',${item.price},'${item.emoji}','${esc(item.desc)}')">+</button>
+      </div>
+      <div class="item-body">
+        <h3>${item.name}</h3>
+        <div class="hall-label">${item.station ? item.station + ' · ' : ''}${halls[item.hallId].name}</div>
+        <div class="price">${item.price > 0 ? '$' + item.price.toFixed(2) : 'Meal Plan'} · ${item.tag}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterItems(q) { renderFeaturedItems(q); }
+
+// ── Menu items ──
+function renderMenuItems(hallId) {
+  const stations = stationData.filter(s => s.hallId === hallId);
+  const allHallItems = menuData.filter(i => i.hallId === hallId);
+  const currentPeriod = getCurrentMealPeriod();
+  const visibleItems = allHallItems.filter(itemAvailableNow);
+  const cats = [...new Set(visibleItems.map(i => i.cat))];
+  const periodText = mealLabel(currentPeriod);
+
+  const stationHtml = `<div class="menu-cat">
+    <h3>Permanent Stations · ${periodText}</h3>
+    ${stations.map(station => {
+      const stationItems = allHallItems.filter(item => stationNameMatchesItem(station.name, item));
+      const stationNow = stationItems.filter(itemAvailableNow);
+      let status = 'Menu items coming soon';
+      if (stationNow.length > 0) status = `${stationNow.length} available now`;
+      else if (stationItems.length > 0) status = 'Available later today';
+      return `<div class="menu-item-row" onclick="openStation('${esc(station.name)}','${esc(halls[station.hallId].name)}')" style="cursor:pointer"> 
+        <div class="emoji">${station.emoji}</div>
+        <div class="info"><h4>${station.name}</h4><p>${station.desc}</p></div>
+        <div class="price"><span style="font-size:11px;color:var(--t2)">${status}</span></div>
+      </div>`;
+    }).join('')}
+  </div>`;
+
+  const menuHtml = cats.length === 0
+    ? `<div class="menu-cat"><h3>${periodText} Menu</h3><div class="station-empty">Dining hall menu items are available from 7am–9pm.</div></div>`
+    : cats.map(cat => {
+      const catItems = visibleItems.filter(i => i.cat === cat);
+      return `<div class="menu-cat">
+        <h3>${cat}</h3>
+        ${catItems.map(item => {
+          const qty = cartQty(item.name);
+          const isFree = item.price === 0;
+          return `<div class="menu-item-row">
+            <div class="emoji">${item.emoji}</div>
+            <div class="info"><h4>${item.name}</h4><p>${item.desc}</p></div>
+            <div class="price">${isFree ? '<span style="font-size:11px;color:var(--t2)">Meal<br>Plan</span>' : '$' + item.price.toFixed(2)}</div>
+            <div class="qty-ctrl">
+              ${qty > 0 ? `<button class="qty-btn" onclick="removeItem('${esc(item.name)}')">−</button><span class="qty-num">${qty}</span>` : ''}
+              <button class="qty-btn plus" onclick="addItem(${hallId},'${esc(item.name)}',${item.price},'${item.emoji}','${esc(item.desc)}')">+</button>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`;
+    }).join('');
+
+  document.getElementById('menu-scroll').innerHTML = stationHtml + menuHtml + '<div style="height:80px"></div>';
+}
+
+
+
+// ── Station modal ──
+function stationNameMatchesItem(stationName, item) {
+  const station = norm(stationName);
+  const itemStation = norm(item.station);
+  const itemCat = norm(item.cat);
+  const itemText = norm([item.name, item.desc, item.station, item.cat].join(' '));
+
+  if (itemStation === station || itemCat === station) return true;
+  if (station.includes('mongolian') && itemText.includes('mongolian')) return true;
+  if (station.includes('wok') && itemText.includes('wok')) return true;
+  if (station.includes('bakery') && (itemText.includes('bakery') || itemText.includes('bagel') || itemText.includes('muffin') || itemText.includes('croissant') || itemText.includes('cookie'))) return true;
+  if ((station.includes('sprouts') || station.includes('plant') || station.includes('veggie')) && (itemText.includes('plant') || itemText.includes('veggie') || item.tag === 'Vegan')) return true;
+  if ((station.includes('salad') || station.includes('harvest')) && (itemText.includes('salad') || itemText.includes('greens') || itemText.includes('beans') || itemText.includes('cucumber'))) return true;
+  if ((station.includes('purple') || station.includes('gluten') || station.includes('allergen')) && item.tag === 'Allergen-Aware') return true;
+  if (station.includes('grill') && (itemText.includes('grill') || itemText.includes('burger') || itemText.includes('sandwich'))) return true;
+  if ((station.includes('pizza') || station.includes('pasta') || station.includes('ciao') || station.includes('al forno')) && (itemText.includes('pizza') || itemText.includes('pasta') || itemText.includes('penne'))) return true;
+  if (station.includes('deli') && (itemText.includes('deli') || itemText.includes('sandwich') || itemText.includes('wrap'))) return true;
+  if ((station.includes('comfort') || station.includes('main plate') || station.includes('entree')) && (itemText.includes('plate') || itemText.includes('chicken') || itemText.includes('entree'))) return true;
+  if ((station.includes('chef') || station.includes('international')) && (itemText.includes('international') || itemText.includes('curry') || itemText.includes('bowl'))) return true;
+  if (station.includes('mezza') && (itemText.includes('mediterranean') || itemText.includes('hummus') || itemText.includes('pita') || itemText.includes('pizza'))) return true;
+
+  return false;
+}
+
+function openStation(stationName, hallName) {
+  const hall = halls.find(h => h.name === hallName);
+  const station = hall ? stationData.find(s => s.hallId === hall.id && s.name === stationName) : null;
+  const stationItems = hall
+    ? menuData.filter(item => item.hallId === hall.id && stationNameMatchesItem(stationName, item))
+    : [];
+  const matchingItems = stationItems.filter(itemAvailableNow);
+  const periodText = mealLabel();
+
+  document.getElementById('station-modal-title').textContent = stationName;
+  document.getElementById('station-modal-hall').textContent = hallName + ' · ' + periodText;
+  document.getElementById('station-modal-note').textContent = station
+    ? station.desc
+    : 'Station information for this dining hall.';
+
+  const list = document.getElementById('station-modal-menu');
+  if (matchingItems.length === 0) {
+    list.innerHTML = stationItems.length > 0
+      ? '<li class="station-empty">Available later today</li>'
+      : '<li class="station-empty">Menu items coming soon</li>';
+  } else {
+    list.innerHTML = matchingItems.map(item => `
+      <li>
+        <div class="emoji">${item.emoji}</div>
+        <div class="info">
+          <strong>${item.name}</strong>
+          <span>${item.desc}</span>
+        </div>
+        <div class="tag">${item.tag}</div>
+      </li>`).join('');
+  }
+
+  document.getElementById('station-modal').classList.add('active');
+}
+
+function closeStation() {
+  document.getElementById('station-modal').classList.remove('active');
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeStation();
+});
+
+// ── Cart helpers ──
+function cartQty(name) {
+  const c = cart.find(i => i.name === name);
+  return c ? c.qty : 0;
+}
+function addItem(hallId, name, price, emoji, desc) {
+  const ex = cart.find(i => i.name === name);
+  if (ex) { ex.qty++; } else { cart.push({hallId, name, price, emoji, desc, qty:1}); }
+  if (currentHallId !== null) renderMenuItems(currentHallId);
+  updateCartBars();
+  renderFeaturedItems(document.getElementById('search-input').value);
+}
+function removeItem(name) {
+  const idx = cart.findIndex(i => i.name === name);
+  if (idx === -1) return;
+  if (cart[idx].qty > 1) cart[idx].qty--;
+  else cart.splice(idx, 1);
+  if (currentHallId !== null) renderMenuItems(currentHallId);
+  updateCartBars();
+}
+function updateCartBars() {
+  const total = cart.reduce((s,i) => s + i.qty, 0);
+  const show = total > 0;
+  document.getElementById('home-cart-bar').style.display = show ? 'block' : 'none';
+  document.getElementById('menu-cart-bar').style.display = show ? 'block' : 'none';
+  document.getElementById('cart-count-home').textContent = total + ' item' + (total !== 1 ? 's' : '');
+  document.getElementById('cart-count-menu').textContent = total + ' item' + (total !== 1 ? 's' : '');
+  const price = calcTotal();
+  document.getElementById('cart-total-btn').textContent = '$' + price.toFixed(2);
+}
+function calcSub()      { return cart.reduce((s,i) => s + (i.price * i.qty), 0); }
+function calcDelivery() { const s = calcSub(); return s > 0 ? 1.99 : 0; }
+function calcTotal()    { const s = calcSub(); return s + calcDelivery() + s * 0.06; }
+
+// ── Render cart ──
+function renderCart() {
+  const itemsEl = document.getElementById('cart-items');
+  const summEl  = document.getElementById('order-summary');
+  if (cart.length === 0) {
+    itemsEl.innerHTML = '<div class="empty">Your cart is empty 🍽️<br><br><a onclick="showHome()">Browse dining halls</a></div>';
+    summEl.innerHTML = '';
+    document.getElementById('checkout-btn').style.opacity = '0.45';
+    document.getElementById('cart-total-btn').textContent = '$0.00';
+    return;
+  }
+  document.getElementById('checkout-btn').style.opacity = '1';
+  itemsEl.innerHTML = cart.map(i => `
+    <div class="cart-item-row">
+      <div class="emoji">${i.emoji}</div>
+      <div class="info">
+        <h4>${i.name}</h4>
+        <p>${i.qty} × ${i.price > 0 ? '$' + i.price.toFixed(2) : 'Meal Plan'}</p>
+      </div>
+      <div class="price">${i.price > 0 ? '$' + (i.price * i.qty).toFixed(2) : 'Incl.'}</div>
+      <button class="remove" onclick="removeItem('${esc(i.name)}');renderCart()">✕</button>
+    </div>`).join('');
+  const sub = calcSub(), delivery = calcDelivery(), tax = sub * 0.06, total = sub + delivery + tax;
+  summEl.innerHTML = `<div class="order-summary">
+    <div class="order-row"><span>Subtotal</span><span>$${sub.toFixed(2)}</span></div>
+    <div class="order-row"><span>Delivery fee</span><span>$${delivery.toFixed(2)}</span></div>
+    <div class="order-row"><span>Tax (6%)</span><span>$${tax.toFixed(2)}</span></div>
+    <div class="order-row total"><span>Total</span><span>$${total.toFixed(2)}</span></div>
+  </div>`;
+  document.getElementById('cart-total-btn').textContent = '$' + total.toFixed(2);
+}
+
+// ── Place order ──
+function placeOrder() {
+  if (cart.length === 0) return;
+  const dorm = document.getElementById('dorm-select').value;
+  const room = document.getElementById('room-input').value.trim();
+  const dormEl = document.getElementById('dorm-select');
+  const roomEl = document.getElementById('room-input');
+  dormEl.style.borderColor = dorm ? 'var(--border)' : 'var(--brand)';
+  roomEl.style.borderColor = room ? 'var(--border)' : 'var(--brand)';
+  if (!dorm || !room) { roomEl.placeholder = '⚠️ Enter your room number'; return; }
+  document.getElementById('order-num').textContent = Math.floor(1000 + Math.random() * 9000);
+  document.getElementById('order-room-display').textContent = dorm + ', Room ' + room;
+  cart = [];
+  updateCartBars();
+  switchScreen('confirm');
+  animateTracker();
+}
+
+// ── Order tracker animation ──
+function animateTracker() {
+  [
+    {dot:'dot2', line:'line2', lbl:'lbl2', delay:5000},
+    {dot:'dot3', line:'line3', lbl:'lbl3', delay:11000},
+    {dot:'dot4', line:'line3', lbl:'lbl4', delay:18000, final:true},
+  ].forEach(s => {
+    setTimeout(() => {
+      const d = document.getElementById(s.dot);
+      const l = document.getElementById(s.line);
+      const lb = document.getElementById(s.lbl);
+      if (d)  d.className  = 't-dot done';
+      if (l)  l.className  = 't-line done';
+      if (lb) lb.className = 't-label done';
+      if (s.final) document.getElementById('eta-badge').textContent = '✅ Delivered!';
+    }, s.delay);
+  });
+}
+
+// ── Reset ──
+function resetApp() {
+  cart = []; currentHallId = null; activeTag = 'All';
+  document.getElementById('dorm-select').value = '';
+  document.getElementById('room-input').value = '';
+  document.getElementById('room-input').placeholder = 'Room number (e.g. 312)';
+  document.getElementById('eta-badge').textContent = '🕐 Ready in 10–20 min';
+  document.querySelectorAll('#chips-row .chip').forEach((c,i) => {
+    c.className = 'chip' + (i === 0 ? ' active' : '');
+  });
+  ['dot2','dot3','dot4'].forEach(id => {
+    const d = document.getElementById(id);
+    if (d) d.className = 't-dot' + (id==='dot2' ? ' active' : '');
+  });
+  ['line2','line3'].forEach(id => {
+    const l = document.getElementById(id);
+    if (l) l.className = 't-line';
+  });
+  ['lbl2','lbl3','lbl4'].forEach(id => {
+    const lb = document.getElementById(id);
+    if (lb) lb.className = 't-label';
+  });
+  updateCartBars();
+  renderFeaturedItems();
+  showHome();
+}
+
+// ── Utility ──
+function esc(s) { return String(s).replace(/'/g, "\\'"); }
+
+// ── Init ──
+renderHalls();
+renderFeaturedItems();
+</script>
+</body>
+</html>
